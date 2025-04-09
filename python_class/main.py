@@ -1,7 +1,7 @@
 import sys
 
 from PySide6.QtCore import Qt
-from PySide6.QtWidgets import QApplication, QTextEdit, QVBoxLayout, QWidget
+from PySide6.QtWidgets import QApplication, QTextEdit, QVBoxLayout, QHBoxLayout, QWidget
 
 app = QApplication(sys.argv)
 
