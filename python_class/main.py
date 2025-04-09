@@ -1,7 +1,7 @@
 import sys
 
 from PySide6.QtCore import Qt
-from PySide6.QtWidgets import QApplication, QTextEdit, QVBoxLayout, QHBoxLayout, QWidget
+from PySide6.QtWidgets import QApplication, QTextEdit, QVBoxLayout, QHBoxLayout, QPushButton, QWidget
 
 app = QApplication(sys.argv)
 
@@ -21,7 +21,7 @@ class NoteWindow(QWidget):
         self.close_btn.setCursor(Qt.CursorShape.PointingHandCursor)
         self.close_btn.clicked.connect(self.close)
         buttons.addStretch()
-        buttons.addWigdet(self.close_btn)
+        buttons.addWidget(self.close_btn)
         layout.addLayout(buttons)
 
         self.text = QTextEdit()
