@@ -21,3 +21,5 @@ class NoteWindow(QWidget):
 note = NoteWindow()
 note.show()
 app.exec()
+
+#hello 
