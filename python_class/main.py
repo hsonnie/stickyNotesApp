@@ -1,9 +1,21 @@
 import sys
 
 from PySide6.QtCore import Qt
-from PySide6.QtWidgets import QApplication, QTextEdit, QVBoxLayout, QHBoxLayout, QPushButton, QWidget
+from PySide6.QtGui import QIcon, QAction
+from PySide6.QtWidgets import (
+    QApplication,
+    QSystemTrayIcon,
+    QMenu,
+    QTextEdit,
+    QVBoxLayout,
+    QHBoxLayout,
+    QPushButton,
+    QWidget,
+)
 
 app = QApplication(sys.argv)
+
+active_notewindows = {}
 
 class NoteWindow(QWidget):
     def __init__ (self):
@@ -12,7 +24,14 @@ class NoteWindow(QWidget):
             self.windowFlags()
             | Qt.WindowType.FramelessWindowHint
             | Qt.WindowType.WindowStaysOnTopHint)
-        self.setStyleSheet("background: #FFFF99; color: #62622f; border: 0; font-size: 16pt;")
+        self.setStyleSheet(
+            """
+            background: #FFFF99; 
+            color: #62622f; 
+            border: 5px 5px 5px 5px black; 
+            font-size: 16pt; 
+            """
+        )
         layout = QVBoxLayout()
 
         buttons = QHBoxLayout()
@@ -27,8 +46,51 @@ class NoteWindow(QWidget):
         self.text = QTextEdit()
         layout.addWidget(self.text)
         self.setLayout(layout)
+        
+        active_notewindows[id(self)] = self
+    
+    def mousePressEvent(self, e):
+        self.previous_pos = e.globalPosition()
+    
+    def mouseMoveEvent(self, e):
+        delta = e.globalPosition() - self.previous_pos
+        self.move(self.x() + delta.x(), self.y() + delta.y())
+        self.previous_pos = e.globalPosition()
+    
 
-note = NoteWindow()
-note.show()
+def create_notewindow():
+    note = NoteWindow()
+    note.show()
+
+create_notewindow()
+
+icon = QIcon("sticky-note.png")
+
+tray = QSystemTrayIcon()
+tray.setIcon(icon)
+tray.setVisible(True)
+
+def handle_tray_click(reason):
+    if (
+        QSystemTrayIcon.ActivationReason(reason)
+        == QSystemTrayIcon.ActivationReason.Trigger
+    ):
+        create_notewindow()
+
+tray.activated.connect(handle_tray_click)
+
+app.setQuitOnLastWindowClosed(False)
+
+menu = QMenu()
+add_note_action = QAction("Add note")
+add_note_action.triggered.connect(create_notewindow)
+menu.addAction(add_note_action)
+
+quit_action = QAction("Quit")
+quit_action.triggered.connect(app.quit)
+menu.addAction(quit_action)
+
+tray.setContextMenu(menu)
+
 app.exec()
 
